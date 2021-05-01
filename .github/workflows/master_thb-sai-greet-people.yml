@@ -27,8 +27,8 @@ jobs:
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v2
       with:
-        name: java-app
-        path: '${{ github.workspace }}/target/*.war'
+        name: demo
+        path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,7 +41,7 @@ jobs:
     - name: Download artifact from build job
       uses: actions/download-artifact@v2
       with:
-        name: java-app
+        name: demo
 
     - name: Deploy to Azure Web App
       id: deploy-to-webapp
@@ -50,4 +50,4 @@ jobs:
         app-name: 'thb-sai-greet-people'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_b85f838fe2814f048373bd9e3a3e5bd9 }}
-        package: '*.war'
+        package: '*.jar'
