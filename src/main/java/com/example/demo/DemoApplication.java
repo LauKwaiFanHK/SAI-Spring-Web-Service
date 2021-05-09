@@ -83,12 +83,12 @@ public class DemoApplication {
     }
     
     @PostMapping(path = "/students")
-    public int createStudent(@RequestParam(value = "name") /*double studentNumber,*/ String name, @RequestParam(value = "age") int age/*, String phoneNumber, String emailAddress, String address*/) {
+    public int createStudent(@RequestParam(value = "name") String name, @RequestParam(value = "age") int age, String phoneNumber, String emailAddress, String address) {
     	if(!(name instanceof String) || name.length() < 2) {
     		System.out.println("Error: invalid name");
     		throw new WrongNameException();
     	} else {
-    		Student student = new Student(name, age /*, phoneNumber, emailAddress, address*/);
+    		Student student = new Student(name, age, phoneNumber, emailAddress, address);
     		
     		StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
 				.configure()

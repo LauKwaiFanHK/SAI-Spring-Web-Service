@@ -24,7 +24,7 @@ class Student {
 	@Column(name="age")
 	private int age;
 	
-	/*
+	
 	@Column(name="phoneNumber")
 	private String phoneNumber;
 	
@@ -32,7 +32,7 @@ class Student {
 	private String emailAddress;
 	
 	@Column(name="address")
-	private String address; */
+	private String address; 
 
 	/*public void greet() {
 		switch (getGender().toString()) {
@@ -55,13 +55,13 @@ class Student {
 		this.studentNumber = studentNumber;
 	}
 	
-	public Student(String name, int age/*, String phoneNumber, String emailAddress,
-			String address*/) {
+	public Student(String name, int age, String phoneNumber, String emailAddress,
+			String address) {
 		this.name = name;
 		this.age = age;
-		/*this.phoneNumber = phoneNumber;
+		this.phoneNumber = phoneNumber;
 		this.emailAddress = emailAddress;
-		this.address = address;*/
+		this.address = address;
 	}
 
 	public String getStudentName() {
@@ -80,7 +80,6 @@ class Student {
 		this.age = age;
 	}
 	
-	/*
 	public String getStudentPhoneNo() {
 		return phoneNumber;
 	}
@@ -103,6 +102,6 @@ class Student {
 	
 	public void setAddress(String address) {
 		this.address = address ;
-	}*/
+	}
 	
 }
