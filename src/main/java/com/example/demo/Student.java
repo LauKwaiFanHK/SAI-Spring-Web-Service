@@ -33,19 +33,6 @@ class Student {
 	
 	@Column(name="address")
 	private String address; 
-
-	/*public void greet() {
-		switch (getGender().toString()) {
-		case "Male":
-			System.out.println("Hallo! Mein Name ist " + name + " und ich bin ein Student.");
-			break;
-		case "Female":
-			System.out.println("Hallo! Mein Name ist " + name + " und ich bin eine Studentin.");
-			break;
-		}
-	}*/
-	
-	
 	
 	public int getStudentNumber() {
 		return studentNumber;
@@ -54,6 +41,8 @@ class Student {
 	public void setStudentNumber(int studentNumber) {
 		this.studentNumber = studentNumber;
 	}
+	
+	public Student() {}
 	
 	public Student(String name, int age, String phoneNumber, String emailAddress,
 			String address) {

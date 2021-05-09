@@ -2,21 +2,30 @@ package com.example.demo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Root;
+
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hsqldb.Session;
+import org.hibernate.criterion.CriteriaQuery;
+//import org.hsqldb.Session;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,7 +38,7 @@ public class DemoApplication {
 	// create global variable for name list
 		List<String> nameList = new ArrayList<>();
 		
-		List<String> studentList = new ArrayList<>();
+		List<Student> studentList = new ArrayList<>();
 		
 
 	public static void main(String[] args) {
@@ -106,30 +115,89 @@ public class DemoApplication {
     		factory.close();
     		
     		int id = student.getStudentNumber();
+    		studentList.add(student);
     		System.out.println("Student is added to database successfully.");
     		return id;
     	}
     }
-    
-    @GetMapping("/students")
-    public String viewStudents() {
-    	ArrayList<Student> students = new ArrayList<>();
-    	/*Student student = new Student(100001, "Willy Wonka", 20, "134657685", "wd@gmail.com", "Hauptstrasse 20, Berlin, 10254");
-    	Student student2 = new Student(100002, "Billy Jai", 19, "123562685", "bj@gmail.com", "Turmstrasse 13, Berlin, 10589");
-    	students.add(student);
-    	students.add(student2);*/
+
+    @GetMapping("/students/all")
+    public List<Student> showStudentList() {
+    	StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    	Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    	SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    	org.hibernate.Session session = factory.openSession();
     	
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        javax.persistence.criteria.CriteriaQuery<Student> cq = cb.createQuery(Student.class);
+        Root<Student> rootEntry = cq.from(Student.class);
+        javax.persistence.criteria.CriteriaQuery<Student> all = cq.select(rootEntry);
+
+        TypedQuery<Student> allQuery = session.createQuery(all);
+        return allQuery.getResultList();
+    }
+    
+    @GetMapping("/students/id")
+    public String showStudent(@RequestParam(value = "id") int id) {
+    		
+    	StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    	Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    	SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    	org.hibernate.Session session = factory.openSession();
+   		session.beginTransaction();
+   		System.out.println("connected? " + session.isConnected());
+   		Student student = session.load(Student.class, id);
+    		
+   		//session.flush();
+    	//session.close();
+    	//factory.close();
+
 		// Serialisation 
+    	String studentObjectMappedToJSONString = null;
 		ObjectMapper om = new ObjectMapper();
-		String studentObjectMappedToJSONString = "";
+		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
 		try {
-			studentObjectMappedToJSONString = om.writeValueAsString(students);
+			studentObjectMappedToJSONString = om.writeValueAsString(student);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		
 		return studentObjectMappedToJSONString;
-		
+   		//return student;
     }
+    
+    @PutMapping("/students/update_address")
+    public void updateStudent(@RequestParam(value = "address") String address, @RequestParam(value = "id") int studentNumber ){
+    	StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    	Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    	SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    	org.hibernate.Session session = factory.openSession();
+        Transaction tx = null;
+        try{
+           tx = session.beginTransaction();
+           Student student = (Student)session.get(Student.class, studentNumber); 
+           student.setAddress(address);
+           session.update(student);
+           tx.commit();
+        }catch (HibernateException e) {
+           if (tx!=null) tx.rollback();
+           e.printStackTrace(); 
+        }finally {
+           session.close(); 
+        }
+     }
 
 }
