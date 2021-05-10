@@ -155,10 +155,6 @@ public class DemoApplication {
    		session.beginTransaction();
    		System.out.println("connected? " + session.isConnected());
    		Student student = session.load(Student.class, id);
-    		
-   		//session.flush();
-    	//session.close();
-    	//factory.close();
 
 		// Serialisation 
     	String studentObjectMappedToJSONString = null;
@@ -172,7 +168,6 @@ public class DemoApplication {
 		}
 		
 		return studentObjectMappedToJSONString;
-   		//return student;
     }
     
     @PutMapping("/students/update_address")
@@ -201,7 +196,7 @@ public class DemoApplication {
      }
     
     @PostMapping(path = "/professors")
-    public String createProfessor(@RequestParam(value = "name") String name, @RequestParam(value = "salary") double salary, String phoneNumber, String emailAddress) {
+    public int createProfessor(@RequestParam(value = "name") String name, @RequestParam(value = "salary") double salary, String phoneNumber, String emailAddress) {
     	if(!(name instanceof String) || name.length() < 2) {
     		System.out.println("Error: invalid name");
     		throw new WrongNameException();
@@ -223,11 +218,85 @@ public class DemoApplication {
     		session.close();
     		factory.close();
     		
-    		/*int id = professor.getProfessionID();
+    		int id = professor.getProfessorID();
     		professorList.add(professor);
-    		System.out.println("Professor is added to database successfully.");*/
-    		return "Professor was added to database successfully.";
+    		System.out.println("Professor is added to database successfully.");
+    		return id;
     	}
     }
+    
+    @GetMapping("/professors/all")
+    public List<Professor> showProfessorList() {
+    	StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    	Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    	SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    	org.hibernate.Session session = factory.openSession();
+    	
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        javax.persistence.criteria.CriteriaQuery<Professor> cq = cb.createQuery(Professor.class);
+        Root<Professor> rootEntry = cq.from(Professor.class);
+        javax.persistence.criteria.CriteriaQuery<Professor> all = cq.select(rootEntry);
+
+        TypedQuery<Professor> allQuery = session.createQuery(all);
+        return allQuery.getResultList();
+    }
+    
+    @GetMapping("/professor/id")
+    public String showProfessor(@RequestParam(value = "id") int id) {
+    		
+    	StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    	Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    	SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    	org.hibernate.Session session = factory.openSession();
+   		session.beginTransaction();
+   		System.out.println("connected? " + session.isConnected());
+   		Professor professor = session.load(Professor.class, id);
+
+		// Serialisation 
+    	String professorObjectMappedToJSONString = null;
+		ObjectMapper om = new ObjectMapper();
+		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+		try {
+			professorObjectMappedToJSONString = om.writeValueAsString(professor);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+		return professorObjectMappedToJSONString;
+    }
+    
+    @PutMapping("/professor/update_email")
+    public void updateProfessorEmail(@RequestParam(value = "email") String emailAddress, @RequestParam(value = "id") int professorID ){
+    	StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    	Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    	SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    	org.hibernate.Session session = factory.openSession();
+        Transaction tx = null;
+        try{
+           tx = session.beginTransaction();
+           Professor professor = (Professor)session.get(Professor.class, professorID); 
+           professor.setEmailAddress(emailAddress);
+           session.update(professor);
+           tx.commit();
+        }catch (HibernateException e) {
+           if (tx!=null) tx.rollback();
+           e.printStackTrace(); 
+        }finally {
+           session.close(); 
+        }
+     }
 
 }

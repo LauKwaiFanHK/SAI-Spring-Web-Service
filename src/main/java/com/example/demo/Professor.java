@@ -16,9 +16,9 @@ class Professor {
 	
 	//primary key
 	@Id
-	@Column(name="professionID")
+	@Column(name="professorID")
 	@GeneratedValue(strategy=GenerationType.AUTO) // generate auto incremental value
-	private int professionID;
+	private int professorID;
 	
 	@Column(name="name")
 	private String name;
@@ -41,12 +41,12 @@ class Professor {
 		this.emailAddress = emailAddress;
 	}
 	
-	public int getProfessionID() {
-		return professionID;
+	public int getProfessorID() {
+		return professorID;
 	}
 
-	public void setProfessionID(int professionID) {
-		this.professionID = professionID;
+	public void setProfessorID(int professorID) {
+		this.professorID = professorID;
 	}
 
 	public String getName() {
