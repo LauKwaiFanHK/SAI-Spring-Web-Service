@@ -1,83 +1,84 @@
 package com.example.demo;
 
-import java.util.ArrayList;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Column;
 
-class Professor extends Person {
-	private ArrayList<Student> listOfStudents = new ArrayList<Student>();
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@Entity
+@Table(name="professors")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+class Professor {
+	
+	//primary key
+	@Id
+	@Column(name="professionID")
+	@GeneratedValue(strategy=GenerationType.AUTO) // generate auto incremental value
+	private int professionID;
+	
+	@Column(name="name")
+	private String name;
+	
+	@Column(name="salary")
 	private double salary;
 	
-	public Professor(String name, int age, String phoneNumber, String emailAddress, Gender g, double salary, ArrayList<Student> listOfStudents, String address) {
-		super(name, age, phoneNumber, emailAddress, g, address);
-		this.salary = salary;
-		this.listOfStudents = listOfStudents;
-	}
+	@Column(name="phoneNumber")
+	private String phoneNumber;
 	
-	public String getProfName() {
-		return name;
-	}
+	@Column(name="email")
+	private String emailAddress;
 	
-	public void setProfName(String name) {
+	public Professor() {}
+	
+	public Professor(String name, double salary, String phoneNumber, String emailAddress) {
 		this.name = name;
-	}
-	
-	public int getProfAge() {
-		return age;
-	}
-	
-	public void setProfAge(int age) {
-		this.age = age;
-	}
-	
-	public String getProfPhone() {
-		return phoneNumber;
-	}
-	
-	public void setProfPhone(String phoneNumber) {
+		this.salary = salary;
 		this.phoneNumber = phoneNumber;
-	}
-	
-	public String getProfEmail() {
-		return emailAddress;
-	}
-	
-	public void setProfEmail(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
 	
-	public String getProfAddress() {
-		return address;
+	public int getProfessionID() {
+		return professionID;
 	}
-	
-	public void setProfAddress(String address) {
-		this.address = address;
+
+	public void setProfessionID(int professionID) {
+		this.professionID = professionID;
 	}
-	
-	public String getStudentName() {
+
+	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
+	public void setSalary(long salary) {
+		this.salary = salary;
 	}
 	
 	public double getSalary() {
 		return salary;
 	}
-	
-	public void setSalary(double salary) {
-		this.salary = salary;
-	}
-	
-	public ArrayList<Student> getList(){
-		return listOfStudents;
-	}
-
-	public void greet() {
-		switch (getGender().toString()) {
-		case "Male":
-			System.out.println("Hallo! Mein Name ist " + name + " und ich bin ein Professor.");
-			break;
-		case "Female":
-			System.out.println("Hallo! Mein Name ist " + name + " und ich bin eine Professorin.");
-			break;
-		}
-	}
-
 
 }

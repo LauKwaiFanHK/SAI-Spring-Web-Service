@@ -38,6 +38,8 @@ public class DemoApplication {
 		
 		List<Student> studentList = new ArrayList<>();
 		
+		List<Professor> professorList = new ArrayList<>();
+		
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
@@ -197,5 +199,35 @@ public class DemoApplication {
            session.close(); 
         }
      }
+    
+    @PostMapping(path = "/professors")
+    public String createProfessor(@RequestParam(value = "name") String name, @RequestParam(value = "salary") double salary, String phoneNumber, String emailAddress) {
+    	if(!(name instanceof String) || name.length() < 2) {
+    		System.out.println("Error: invalid name");
+    		throw new WrongNameException();
+    	} else {
+    		Professor professor = new Professor(name, salary, phoneNumber, emailAddress);
+    		
+    		StandardServiceRegistry ssr = new StandardServiceRegistryBuilder()
+				.configure()
+				.build();
+				
+    		Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+    		SessionFactory factory = meta.getSessionFactoryBuilder().build();
+    		org.hibernate.Session session = factory.openSession();
+    		session.beginTransaction();
+    		session.persist(professor); 
+    		System.out.println("connected? " + session.isConnected());
+    		session.flush();
+    		session.close();
+    		factory.close();
+    		
+    		/*int id = professor.getProfessionID();
+    		professorList.add(professor);
+    		System.out.println("Professor is added to database successfully.");*/
+    		return "Professor was added to database successfully.";
+    	}
+    }
 
 }

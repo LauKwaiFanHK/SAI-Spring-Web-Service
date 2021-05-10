@@ -14,5 +14,6 @@
         <property name="format_sql">true</property>
         <property name="hbm2ddl.auto">update </property>
         <mapping class="com.example.demo.Student"/>
+        <mapping class="com.example.demo.Professor"/>
     </session-factory>
 </hibernate-configuration>
